@@ -1,3 +1,11 @@
+function getPartialContent($path,$extension,$partial){
+    try{
+        $content= Get-Content -Path "$PSScriptRoot\Signatures\$($path)_partials\$($partial)$($extension)"
+        return $content
+    }catch{
+        return ""
+    }
+}
 # Win32 app runs PowerShell in 32-bit by default. AzureAD module requires PowerShell in 64-bit, so we are going to trigger a rerun in 64-bit.
 if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
     try {
@@ -36,25 +44,25 @@ foreach ($signatureFile in $signatureFiles) {
 
         # Replace placeholder values
         $signatureFileContent = $signatureFileContent -replace "%DisplayName%", $userObject.DisplayName
-        $signatureFileContent = $signatureFileContent -replace "%GivenName%", $userObject.GivenName
-        $signatureFileContent = $signatureFileContent -replace "%Surname%", $userObject.Surname
         $signatureFileContent = $signatureFileContent -replace "%Mail%", $userObject.Mail
-        $signatureFileContent = $signatureFileContent -replace "%Mobile%", $userObject.Mobile
         $signatureFileContent = $signatureFileContent -replace "%TelephoneNumber%", $userObject.TelephoneNumber
         $signatureFileContent = $signatureFileContent -replace "%JobTitle%", $userObject.JobTitle
-        $signatureFileContent = $signatureFileContent -replace "%Department%", $userObject.Department
-        $signatureFileContent = $signatureFileContent -replace "%City%", $userObject.City
-        $signatureFileContent = $signatureFileContent -replace "%Country%", $userObject.Country
-        $signatureFileContent = $signatureFileContent -replace "%StreetAddress%", $userObject.StreetAddress
-        $signatureFileContent = $signatureFileContent -replace "%PostalCode%", $userObject.PostalCode
-        $signatureFileContent = $signatureFileContent -replace "%Country%", $userObject.Country
-        $signatureFileContent = $signatureFileContent -replace "%State%", $userObject.State
-        $signatureFileContent = $signatureFileContent -replace "%PhysicalDeliveryOfficeName%", $userObject.PhysicalDeliveryOfficeName
+       
+        
+        $partial = getPartialContent $signatureFile.BaseName $signatureFile.Extension "Mobile"
+        $signatureFileContent = $signatureFileContent -replace "%Mobile%", $userObject.Mobile
+
+        if($userObject.Department -like "Sales"){
+            $partial = getPartialContent $signatureFile.BaseName $signatureFile.Extension "Department"
+            $signatureFileContent = $signatureFileContent -replace "%Department%", $partial
+        }else{
+            $signatureFileContent = $signatureFileContent -replace "%Department%", ""
+        }
 
         # Set file content with actual values in $env:APPDATA\Microsoft\Signatures
         Set-Content -Path "$($env:APPDATA)\Microsoft\Signatures\$($signatureFile.Name)" -Value $signatureFileContent -Force
     } elseif ($signatureFile.getType().Name -eq 'DirectoryInfo') {
-        Copy-Item -Path $signatureFile.FullName -Destination "$($env:APPDATA)\Microsoft\Signatures\$($signatureFile.Name)" -Recurse -Force
+        Copy-Item -Path $signatureFile.FullName -Destination "$($env:APPDATA)\Microsoft\Signatures\" -Recurse -Force
     }
 }
 
