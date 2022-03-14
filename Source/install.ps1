@@ -62,7 +62,11 @@ foreach ($signatureFile in $signatureFiles) {
         # Set file content with actual values in $env:APPDATA\Microsoft\Signatures
         Set-Content -Path "$($env:APPDATA)\Microsoft\Signatures\$($signatureFile.Name)" -Value $signatureFileContent -Force
     } elseif ($signatureFile.getType().Name -eq 'DirectoryInfo') {
-        Copy-Item -Path $signatureFile.FullName -Destination "$($env:APPDATA)\Microsoft\Signatures\" -Recurse -Force
+        try{
+            Copy-Item -Path $signatureFile.FullName -Destination "$($env:APPDATA)\Microsoft\Signatures\" -Recurse -Force
+        }catch{
+
+        }
     }
 }
 
