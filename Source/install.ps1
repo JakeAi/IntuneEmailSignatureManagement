@@ -1,14 +1,3 @@
-function getPartialContent($path, $extension, $partial) {
-    try {
-        $content = Get-Content -Path "$PSScriptRoot\Signatures\$($path)_partials\$($partial)$($extension)"
-        return $content
-    }
-    catch {
-        return ""
-    }
-}
-
-
 Start-Transcript -Path "$($env:TEMP)\IntuneSignatureManagerForOutlook-log.txt" -Force
 
 # Disable roaming signatures
@@ -23,21 +12,13 @@ if (-not (Test-Path "$($env:APPDATA)\Microsoft\Signatures")) {
 # Get all signature files
 $signatureFiles = Get-ChildItem -Path "$PSScriptRoot\Users\$userPrincipalName"
 try {
-    Get-ChildItem -Path $signatureFiles -Recurse -Filter "thumbs.db" | Remove-Item
     Get-ChildItem -Path "$($env:APPDATA)\Microsoft\Signatures\" -Recurse -Filter "thumbs.db" | Remove-Item 
-}
-catch {
-}
+} catch { }
 
 foreach ($signatureFile in $signatureFiles) {
-
     try {
         Copy-Item -Path $signatureFile.FullName -Destination "$($env:APPDATA)\Microsoft\Signatures\" -Recurse -Force
-    }
-    catch {
-
-    }
-    
+    } catch { }    
 }
 
 Stop-Transcript
