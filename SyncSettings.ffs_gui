@@ -22,6 +22,7 @@
             <Item>*\thumbs.db</Item>
             <Item>update.ps1</Item>
             <Item>uninstall.ps1</Item>
+            <Item>Signatures</Item>
         </Exclude>
         <TimeSpan Type="None">0</TimeSpan>
         <SizeMin Unit="None">0</SizeMin>
