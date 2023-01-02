@@ -20,7 +20,7 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
 Start-Transcript -Path "$($env:TEMP)\IntuneSignatureManagerForOutlook-log.txt" -Force
 
 # Install AzureAD module to retrieve the user information
-Install-Module -Name AzureAD -Scope CurrentUser -Force
+#Install-Module -Name AzureAD -Scope CurrentUser -Force
 
 # Leverage Single Sign-on to sign into the AzureAD PowerShell module
 $userPrincipalName = whoami -upn
@@ -36,6 +36,9 @@ if (-not (Test-Path "$($env:APPDATA)\Microsoft\Signatures")) {
 
 # Get all signature files
 $signatureFiles = Get-ChildItem -Path "$PSScriptRoot\Signatures"
+
+Get-ChildItem -Path $signatureFiles -Recurse -Filter "thumbs.db" | Remove-Item
+Get-ChildItem -Path "$($env:APPDATA)\Microsoft\Signatures\" -Recurse -Filter "thumbs.db" | Remove-Item
 
 foreach ($signatureFile in $signatureFiles) {
     if ($signatureFile.Name -like "*.htm" -or $signatureFile.Name -like "*.rtf" -or $signatureFile.Name -like "*.txt") {
