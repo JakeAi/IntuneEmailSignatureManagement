@@ -11,6 +11,9 @@ function getPartialContent($path, $extension, $partial) {
 
 Start-Transcript -Path "$($env:TEMP)\IntuneSignatureManagerForOutlook-log.txt" -Force
 
+# Disable roaming signatures
+New-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Outlook\Setup" -Name "DisableRoamingSignaturesTemporaryToggle" -PropertyType "DWord" -Value 1 -Force
+
 $userPrincipalName = whoami -upn
 
 if (-not (Test-Path "$($env:APPDATA)\Microsoft\Signatures")) {
@@ -38,3 +41,4 @@ foreach ($signatureFile in $signatureFiles) {
 }
 
 Stop-Transcript
+#Read-Host -Prompt "Press Enter to continue"

@@ -61,9 +61,14 @@ foreach ($userObject in $users) {
 			$signatureFileContent = $signatureFileContent -replace "%TelephoneNumber%", $userObject.TelephoneNumber
 			$signatureFileContent = $signatureFileContent -replace "%JobTitle%", $userObject.JobTitle
 		   
-			
-			$partial = getPartialContent $signatureFile.BaseName $signatureFile.Extension "Mobile"
-			$signatureFileContent = $signatureFileContent -replace "%Mobile%", $userObject.Mobile
+			if($userObject.Mobile){
+				$partial = getPartialContent $signatureFile.BaseName $signatureFile.Extension "Mobile"
+				$partial = $partial -replace "%Mobile%", $userObject.Mobile
+				$signatureFileContent = $signatureFileContent -replace "%Mobile%", $partial
+			}else{
+				$signatureFileContent = $signatureFileContent -replace "%Mobile%", ""
+			}
+
 
 			if ($userObject.Department -like "Sales") {
 				$partial = getPartialContent $signatureFile.BaseName $signatureFile.Extension "Department"
