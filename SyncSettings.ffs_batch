@@ -23,6 +23,8 @@
             <Item>update.ps1</Item>
             <Item>uninstall.ps1</Item>
             <Item>Signatures</Item>
+            <Item>*\SAP_*</Item>
+            <Item>*\Minnich_partials</Item>
         </Exclude>
         <TimeSpan Type="None">0</TimeSpan>
         <SizeMin Unit="None">0</SizeMin>

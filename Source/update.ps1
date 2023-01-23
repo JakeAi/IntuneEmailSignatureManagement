@@ -34,7 +34,7 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
 Start-Transcript -Path "$($env:TEMP)\IntuneSignatureManagerForOutlook-log.txt" -Force
 
 # Install AzureAD module to retrieve the user information
-#Install-Module -Name AzureAD -Scope CurrentUser -Force
+Install-Module -Name AzureAD -Scope CurrentUser -Force
 
 # Leverage Single Sign-on to sign into the AzureAD PowerShell module
 $userPrincipalName = whoami -upn
@@ -67,7 +67,9 @@ foreach ($userObject in $users) {
 			$signatureFileContent = $signatureFileContent -replace "%JobTitle%", $userObject.JobTitle
 
 			$signatureFileContent = $signatureFileContent -replace "%Mobile%", (getPartialWithContent $signatureFile "Mobile" $userObject.Mobile)
-		   
+			# $signatureFileContent = $signatureFileContent -replace "%Tradeshows%", (getPartial $signatureFile "Tradeshows")
+			$signatureFileContent = $signatureFileContent -replace "%Tradeshows%", ""
+
 			if ($userObject.Department -like "Sales") {
 				$partial = getPartial $signatureFile "Department"
 				$signatureFileContent = $signatureFileContent -replace "%Department%", $partial
