@@ -34,15 +34,15 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
 Start-Transcript -Path "$($env:TEMP)\IntuneSignatureManagerForOutlook-log.txt" -Force
 
 # Install AzureAD module to retrieve the user information
-Install-Module -Name AzureAD -Scope CurrentUser -Force
+#Install-Module -Name Microsoft.Graph -Scope CurrentUser -Force
 
 # Leverage Single Sign-on to sign into the AzureAD PowerShell module
 $userPrincipalName = whoami -upn
 $usersRootDirectory = Resolve-Path -Path "$PSScriptRoot\Users"
 $signaturesRootDirectory = Get-ChildItem -Path "$PSScriptRoot\Signatures"
 
-Connect-AzureAD -AccountId $userPrincipalName
-$users = Get-AzureADUser -All $true
+Connect-MgGraph -Scopes 'User.Read.All'
+$users = Get-MgUser -All
 
 foreach ($userObject in $users) {
 
@@ -59,11 +59,11 @@ foreach ($userObject in $users) {
 		if ($signatureFile.Name -like "*.htm" -or $signatureFile.Name -like "*.rtf" -or $signatureFile.Name -like "*.txt") {
 			# Get file content with placeholder values
 			$signatureFileContent = Get-Content -Path $signatureFile.FullName
-
-			# Replace placeholder values
+			#Write-Host ($userObject | Format-List -Force | Out-String)
+						# Replace placeholder values
 			$signatureFileContent = $signatureFileContent -replace "%DisplayName%", $userObject.DisplayName
 			$signatureFileContent = $signatureFileContent -replace "%Mail%", $userObject.Mail
-			$signatureFileContent = $signatureFileContent -replace "%TelephoneNumber%", $userObject.TelephoneNumber
+			$signatureFileContent = $signatureFileContent -replace "%TelephoneNumber%", $userObject.BusinessPhones[0]
 			$signatureFileContent = $signatureFileContent -replace "%JobTitle%", $userObject.JobTitle
 
 			$signatureFileContent = $signatureFileContent -replace "%Mobile%", (getPartialWithContent $signatureFile "Mobile" $userObject.Mobile)
